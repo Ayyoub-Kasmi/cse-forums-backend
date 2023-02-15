@@ -1,0 +1,34 @@
+{
+  "name": "cse-forums-backend",
+  "version": "1.0.0",
+  "description": "Backend source code for CSE Forums platform project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ayyoub-Kasmi/cse-forums-backend.git"
+  },
+  "keywords": [
+    "CSE",
+    "Forums",
+    "Backend"
+  ],
+  "author": "CSE",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ayyoub-Kasmi/cse-forums-backend/issues"
+  },
+  "homepage": "https://github.com/Ayyoub-Kasmi/cse-forums-backend#readme",
+  "dependencies": {
+    "@prisma/client": "^4.10.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-joi-validation": "^5.0.1",
+    "joi": "^17.7.1"
+  },
+  "devDependencies": {
+    "prisma": "^4.10.1"
+  }
+}
