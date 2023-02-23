@@ -1,0 +1,21 @@
+const jwt = require("jsonwebtoken");
+
+module.exports = (req, res, next) => {
+    //get the token from the cookies
+    const jwtToken = req.cookies.jwt;
+    
+    //check if the token is there
+    if(!token) res.redirect('/user/login');
+    else{
+
+        //The token is there, check if it's valid
+        jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decodedToken) => {
+
+            if(err){
+                res.redirect('/user/login');
+            }else{
+                next();
+            }
+        })
+    }
+}

@@ -1,36 +1,34 @@
 /** Configure Environment variables */
 require('dotenv').config();
 
-/** Required Node.js modules */
-const Prisma = require('prisma/prisma-client');
-const Joi = require('joi');
-
 /** Initialize Express */
-const Express = require('express');
-const app = Express();
+const express = require('express');
+const app = express();
 
 /** Setup midleware */
-app.use(Express.json());
-const joiMiddleware = require('express-joi-validation').createValidator({})
+app.use(express.json());
 
-/** Supplier validation schema for Joi */
-const supplierSchema = Joi.object({
-    Id: Joi.number().greater(0),
-    name: Joi.string().alphanum().min(1).max(191).required(),
-    contact: Joi.string().alphanum().min(1).max(191).required(),
-    email: Joi.string().email().max(191).required(),
-    phone_num: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
-    address: Joi.string().alphanum().min(1).max(191).required(),
-  });
-  
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 /** Routes */
+const authRoutes = require('./routes/authRoutes');
+
 app.get('/', (req, res) => {
-    res.send("Hello, API server!");
+    res.send("Welcome to the CSE Forums platform!");
 });
+app.use(authRoutes);
 
 /** Server */
 const PORT = process.env.PORT || 5000;
-const prisma = new Prisma.PrismaClient();
+
 app.listen(PORT, () => {
     console.log(`Server listening on PORT: ${PORT}`);
 });
+
+/**
+ * Supply the repo with a README file as a documentation for the team
+ * Create a Google document for the documentation of the backend side (Database Schema & routes)
+ * Check if there're hooks in prisma
+ * Check some material on how Frontend and Backend are linked
+ * Should the redirection happen from the front or the back side?
+ */
