@@ -62,12 +62,12 @@ model user {
   username      String          @unique(map: "username") @db.VarChar(255)
   email         String          @unique(map: "email") @db.VarChar(255)
   password      String          @db.VarChar(255)
-  title         String          @db.VarChar(255)
-  bio           String          @db.Text
+  title         String?         @db.VarChar(255)
+  bio           String?         @db.Text
   creation_date DateTime        @db.Date
-  facebook_id   String          @db.VarChar(255)
-  instagram_id  String          @db.VarChar(255)
-  github_id     String          @db.VarChar(255)
+  facebook_id   String?         @db.VarChar(255)
+  instagram_id  String?         @db.VarChar(255)
+  github_id     String?         @db.VarChar(255)
   user_answer   user_answer[]
   user_question user_question[]
 }
