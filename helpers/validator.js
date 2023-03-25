@@ -25,6 +25,11 @@ module.exports = {
         loginSchema: Joi.object({
             email: Joi.string().email().max(191).required(),
             password: Joi.string().min(6).required(),
+        }),
+        answerSchema: Joi.object({
+            content: Joi.string().max(500).required(),
+            user_id: Joi.number().required(),
+            question_id: Joi.number().required(),
         })
     },
     validateBody: (schema) => {
@@ -34,7 +39,7 @@ module.exports = {
             if(error) {
                 res.status(400).json({
                     success: false,
-                    message: error.message,
+                    message: error.message, //here we can customize the error message even more
                     data: {}
                 });
             }else {
