@@ -8,86 +8,65 @@ datasource db {
 }
 
 model answer {
-  id              Int               @id @default(autoincrement())
-  content         String            @db.Text
-  date            DateTime          @db.Date
-  upvotes         Int
-  downvotes       Int
-  answer_reply    answer_reply[]
-  question_answer question_answer[]
-  user_answer     user_answer[]
-}
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  date        DateTime @db.DateTime(0)
+  upvotes     Int
+  downvotes   Int
+  user_id     Int
+  question_id Int
+  user        user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk0")
+  question    question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk1")
+  reply       reply[]
 
-model answer_reply {
-  answer_id Int
-  reply_id  Int
-  answer    answer @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_Reply_fk0")
-  reply     reply  @relation(fields: [reply_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_Reply_fk1")
-
-  @@id([answer_id, reply_id])
-  @@index([reply_id], map: "Answer_Reply_fk1")
+  @@index([user_id], map: "Answer_fk0")
+  @@index([question_id], map: "Answer_fk1")
 }
 
 model question {
-  id              Int               @id @default(autoincrement())
-  title           String            @db.VarChar(255)
-  content         String            @db.Text
-  date            DateTime          @db.Date
-  tags            String            @db.VarChar(255)
-  question_answer question_answer[]
-  user_question   user_question[]
-}
+  id      Int      @id @default(autoincrement())
+  title   String   @db.VarChar(255)
+  content String   @db.Text
+  date    DateTime @db.DateTime(0)
+  tags    String   @db.VarChar(255)
+  user_id Int
+  answer  answer[]
+  user    user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Question_fk0")
+  reply   reply[]
 
-model question_answer {
-  question_id Int
-  answer_id   Int
-  question    question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Question_Answer_fk0")
-  answer      answer   @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Question_Answer_fk1")
-
-  @@id([question_id, answer_id])
-  @@index([answer_id], map: "Question_Answer_fk1")
+  @@index([user_id], map: "Question_fk0")
 }
 
 model reply {
-  id           Int            @id @default(autoincrement())
-  content      String         @db.Text
-  date         DateTime       @db.Date
-  upvotes      Int
-  downvotes    Int
-  answer_reply answer_reply[]
+  id          Int      @id @default(autoincrement())
+  content     String   @db.Text
+  date        DateTime @db.DateTime(0)
+  upvotes     Int
+  downvotes   Int
+  question_id Int
+  user_id     Int
+  answer_id   Int
+  question    question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk0")
+  user        user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk1")
+  answer      answer   @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk2")
+
+  @@index([question_id], map: "Reply_fk0")
+  @@index([user_id], map: "Reply_fk1")
+  @@index([answer_id], map: "Reply_fk2")
 }
 
 model user {
-  id            Int             @id @default(autoincrement())
-  username      String          @unique(map: "username") @db.VarChar(255)
-  email         String          @unique(map: "email") @db.VarChar(255)
-  password      String          @db.VarChar(255)
-  title         String?         @db.VarChar(255)
-  bio           String?         @db.Text
-  creation_date DateTime        @db.Date
-  facebook_id   String?         @db.VarChar(255)
-  instagram_id  String?         @db.VarChar(255)
-  github_id     String?         @db.VarChar(255)
-  user_answer   user_answer[]
-  user_question user_question[]
-}
-
-model user_answer {
-  user_id   Int
-  answer_id Int
-  user      user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_Answer_fk0")
-  answer    answer @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_Answer_fk1")
-
-  @@id([user_id, answer_id])
-  @@index([answer_id], map: "User_Answer_fk1")
-}
-
-model user_question {
-  user_id     Int
-  question_id Int
-  user        user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_Question_fk0")
-  question    question @relation(fields: [question_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_Question_fk1")
-
-  @@id([user_id, question_id])
-  @@index([question_id], map: "User_Question_fk1")
+  id            Int        @id @default(autoincrement())
+  username      String     @unique(map: "username") @db.VarChar(255)
+  email         String     @unique(map: "email") @db.VarChar(255)
+  password      String     @db.VarChar(255)
+  title         String     @db.VarChar(255)
+  bio           String     @db.Text
+  creation_date DateTime   @db.DateTime(0)
+  facebook_id   String     @db.VarChar(255)
+  instagram_id  String     @db.VarChar(255)
+  github_id     String     @db.VarChar(255)
+  answer        answer[]
+  question      question[]
+  reply         reply[]
 }

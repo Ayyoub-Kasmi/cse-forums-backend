@@ -49,7 +49,14 @@ module.exports.post_signup = async (req, res) => {
 
     } catch (error) {
         //send Error message
-        let message = error.message.split('\n');
+        let message = error.message.split('\n'); //This didn't work for
+            //some cases => necessesity to check all possible cases
+
+        // if( error instanceof Prisma.PrismaClientValidationError){
+        //     message = error.message.split('\n');
+        // }
+        //add an "if" for the case of "unique" constraint violation
+
         res.status(400).json({
             success: false,
             message,
