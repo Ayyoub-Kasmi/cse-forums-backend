@@ -30,7 +30,7 @@ module.exports.answer_post = async (req, res) => {
         res.status(300).json({
             success: true,
             message: "answer created successfully",
-            date: answer,
+            data: answer,
         })
 
     } catch (error) {

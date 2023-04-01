@@ -1,6 +1,5 @@
 //importing prisma Client
 const jwt = require('jsonwebtoken');
-const { Prisma } = require('prisma/prisma-client');
 const prisma = require('../prisma/client');
 const bcrypt = require('bcrypt');
 
