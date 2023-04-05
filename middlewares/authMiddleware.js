@@ -5,15 +5,17 @@ module.exports = (req, res, next) => {
     const jwtToken = req.cookies.jwt;
     
     //check if the token is there
-    if(!token) res.redirect('/user/login');
+    if(!jwtToken) res.redirect('/login');
     else{
 
         //The token is there, check if it's valid
         jwt.verify(jwtToken, process.env.JWT_SECRET, (err, decodedToken) => {
 
             if(err){
-                res.redirect('/user/login');
+                res.redirect('/login');
             }else{
+                console.log("docoded token:");
+                console.log(decodedToken);
                 next();
             }
         })

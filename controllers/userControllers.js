@@ -22,7 +22,7 @@ module.exports.get_profile = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: "Error fetching user" + error.message,
+            message: "Error fetching user: " + error.message,
             data: {}
         })
     }
@@ -49,7 +49,7 @@ module.exports.update_profile = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: "error updating user info",
+            message: "error updating user info: "+error.message,
             data: {}
         })
     }
@@ -74,7 +74,7 @@ module.exports.delete_profile = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Error while deleting user' + error.message,
+            message: 'Error while deleting user: ' + error.message,
             data: {}
         })
     }
@@ -157,7 +157,7 @@ module.exports.delete_favorite = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Favorite deletion failed' + error.message,
+            message: 'Favorite deletion failed: ' + error.message,
             data: {},
         })
     }
@@ -183,7 +183,7 @@ module.exports.get_activities = async (req, res) => {
         
         res.status(400).json({
             success: false,
-            message: "Couldn't fetch activities",
+            message: "Couldn't fetch activities: "+error.message,
             data: {}
         })
     }
@@ -208,7 +208,7 @@ module.exports.add_activity = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Adding activity failed' + error.message,
+            message: 'Adding activity failed: ' + error.message,
             data: {}
         })
     }
@@ -218,7 +218,6 @@ module.exports.delete_activity = async (req, res) => {
     try {
         // const userId = Number(req.params.id);
         const activityId = Number(req.body.activity_id);
-        console.log(req.body.activity_id, activityId)
 
         const activity = await prisma.activity.delete({
             where: {
@@ -235,7 +234,7 @@ module.exports.delete_activity = async (req, res) => {
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Activity deletion failed' + error.message,
+            message: 'Activity deletion failed: ' + error.message,
             data: {},
         })
     }
