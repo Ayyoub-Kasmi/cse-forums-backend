@@ -14,8 +14,7 @@ module.exports = (req, res, next) => {
             if(err){
                 res.redirect('/login');
             }else{
-                console.log("docoded token:");
-                console.log(decodedToken);
+                res.locals.user = decodedToken;
                 next();
             }
         })
