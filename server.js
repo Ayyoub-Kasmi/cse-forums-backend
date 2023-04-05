@@ -12,13 +12,15 @@ const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 /** Routes */
 const authRoutes = require('./routes/authRoutes');
-const answerRoutes = require('./routes/answerRoutes');
+const userRoutes = require('./routes/userRoutes');
+// const answerRoutes = require('./routes/answerRoutes');
 
 app.get('/', (req, res) => {
     res.send("Welcome to the CSE Forums platform!");
 });
 
-app.use(answerRoutes);
+// app.use(answerRoutes);
+app.use(userRoutes);
 app.use(authRoutes);
 
 /** Server */

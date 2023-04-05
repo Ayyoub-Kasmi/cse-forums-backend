@@ -1,4 +1,6 @@
-const jwt = require('jwt');
+const jwt = require('jsonwebtoken');
+const prisma = require('../prisma/client');
+
 
 module.exports = async (req, res, next) => {
     // res.locals.user will be used to store the data of the logged-in user
@@ -11,7 +13,7 @@ module.exports = async (req, res, next) => {
     }
     else{
         //Token exists, verify it
-        jwt.verify(token, process.env.JWT_SECRET, async (err, decodedToken) => {
+        jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, decodedToken) => {
 
             if(err){
                 //Invalid token
