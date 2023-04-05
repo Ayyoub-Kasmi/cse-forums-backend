@@ -11,8 +11,8 @@ app.use(express.json());
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 /** Routes */
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
+const authRoutes = require('./auth/authRoutes');
+const userRoutes = require('./user/userRoutes');
 // const answerRoutes = require('./routes/answerRoutes');
 
 app.get('/', (req, res) => {
@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 });
 
 // app.use(answerRoutes);
-app.use(userRoutes);
+app.use('/user', userRoutes);
 app.use(authRoutes);
 
 /** Server */
@@ -30,9 +30,6 @@ app.listen(PORT, () => {
     console.log(`Server listening on PORT: ${PORT}`);
 });
 /**
- * Supply the repo with a README file as a documentation for the team
- * Create a Google document for the documentation of the backend side (Database Schema & routes)
- * Check if there're hooks in prisma
  * Check some material on how Frontend and Backend are linked
  * Should the redirection happen from the front or the back side?
  * Time stamps for prisma schemas

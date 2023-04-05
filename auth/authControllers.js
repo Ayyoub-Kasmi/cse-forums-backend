@@ -115,7 +115,7 @@ module.exports.post_login = async (req, res) => {
     }
 }
 
-module.exports.logout_get = (req, res) => {
+module.exports.post_logout = (req, res) => {
     //set the cookie to '' and set a short expiry duration
     res.cookie('jwt', '', { maxAge: 1 });
 
