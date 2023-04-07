@@ -2,7 +2,6 @@ const { Router } = require('express');
 
 const userControllers = require('./userControllers');
 const requireAuth = require('../auth/authMiddleware');
-const checkUser = require('./userCheckMiddlware');
 
 //import sub-routes
 const favoriteRoutes = require('./favorites/favoriteRoutes')

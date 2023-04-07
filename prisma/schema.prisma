@@ -7,83 +7,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model activity {
-  id      Int  @id @default(autoincrement())
-  user_id Int
-  user    user @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Activity_fk0")
-
-  @@index([user_id], map: "Activity_fk0")
-}
-
 model answer {
+  id        Int      @id @default(autoincrement())
   thread_id Int
   user_id   Int
   content   String   @db.Text
   date      DateTime @db.Date
-  upvotes   Int
-  downvotes Int
+  likes     Int?     @default(0)
   thread    thread   @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk0")
   user      user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk1")
+  like      like[]
+  reply     reply[]
 
-  @@id([thread_id, user_id])
+  @@index([thread_id], map: "Answer_fk0")
   @@index([user_id], map: "Answer_fk1")
 }
 
+model like {
+  id        Int     @id @default(autoincrement())
+  user_id   Int
+  answer_id Int?
+  reply_id  Int?
+  user      user    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Like_fk0")
+  answer    answer? @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Like_fk1")
+  reply     reply?  @relation(fields: [reply_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Like_fk2")
+
+  @@unique([user_id, answer_id], map: "unique_user_like")
+  @@unique([user_id, reply_id], map: "unique_user_reply_like")
+  @@index([answer_id], map: "Like_fk1")
+  @@index([reply_id], map: "Like_fk2")
+}
+
+model reply {
+  id          Int       @id @default(autoincrement())
+  answer_id   Int
+  user_id     Int
+  content     String    @db.Text
+  parent_id   Int?
+  date        DateTime? @db.Date
+  like        like[]
+  answer      answer    @relation(fields: [answer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk0")
+  user        user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk1")
+  reply       reply?    @relation("replyToreply", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Reply_fk2")
+  other_reply reply[]   @relation("replyToreply")
+
+  @@index([answer_id], map: "Reply_fk0")
+  @@index([user_id], map: "Reply_fk1")
+  @@index([parent_id], map: "Reply_fk2")
+}
+
+model tag {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique(map: "unique_tag_name") @db.VarChar(255)
+  threads_tags threads_tags[]
+}
+
 model thread {
-  id      Int      @id @default(autoincrement())
-  title   String   @db.VarChar(255)
-  content String   @db.Text
-  date    DateTime @db.Date
-  tags    String   @db.VarChar(255)
-  user_id Int
-  answer  answer[]
-  user    user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Thread_fk0")
+  id            Int            @id @default(autoincrement())
+  title         String         @db.VarChar(255)
+  content       String         @db.Text
+  date          DateTime       @db.Date
+  user_id       Int
+  upvotes       Int            @default(0)
+  downvotes     Int            @default(0)
+  views         Int?           @default(0)
+  answers_count Int            @default(0)
+  likes_count   Int            @default(0)
+  answer        answer[]
+  user          user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Thread_fk0")
+  threads_tags  threads_tags[]
+  vote          vote[]
 
   @@index([user_id], map: "Thread_fk0")
 }
 
+model threads_tags {
+  thread_id Int
+  tag_id    Int
+  thread    thread @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "threads_tags_fk0")
+  tag       tag    @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "threads_tags_fk1")
+
+  @@id([thread_id, tag_id])
+  @@index([tag_id], map: "threads_tags_fk1")
+}
+
 model user {
-  id                                  Int              @id @default(autoincrement())
-  username                            String           @unique(map: "username") @db.VarChar(255)
-  email                               String           @unique(map: "email") @db.VarChar(255)
-  password                            String           @db.VarChar(255)
-  title                               String           @db.VarChar(255)
-  bio                                 String           @db.Text
-  creation_date                       DateTime         @db.Date
-  facebook_id                         String           @db.VarChar(255)
-  instagram_id                        String           @db.VarChar(255)
-  github_id                           String           @db.VarChar(255)
-  activity                            activity[]
-  answer                              answer[]
-  favorite_favorite_user_idTouser     favorite[]       @relation("favorite_user_idTouser")
-  favorite_favorite_favorite_idTouser favorite[]       @relation("favorite_favorite_idTouser")
-  thread                              thread[]
-  user_community                      user_community[]
+  id            Int      @id @default(autoincrement())
+  username      String   @unique(map: "username") @db.VarChar(255)
+  email         String   @unique(map: "email") @db.VarChar(255)
+  password      String   @db.VarChar(255)
+  title         String   @db.VarChar(255)
+  bio           String?  @db.Text
+  creation_date DateTime @db.Date
+  facebook_id   String?  @db.VarChar(255)
+  instagram_id  String?  @db.VarChar(255)
+  github_id     String?  @db.VarChar(255)
+  points        Int      @default(0)
+  answer        answer[]
+  like          like[]
+  reply         reply[]
+  thread        thread[]
+  vote          vote[]
 }
 
-model community {
-  id             Int              @id @default(autoincrement())
-  name           String           @db.VarChar(255)
-  score          Int              @default(0)
-  user_community user_community[]
-}
+model vote {
+  user_id   Int
+  thread_id Int
+  type      String @db.VarChar(255)
+  user      user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Vote_fk0")
+  thread    thread @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Vote_fk1")
 
-model user_community {
-  user_id      Int
-  community_id Int
-  user         user      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_community_fk0")
-  community    community @relation(fields: [community_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_community_fk1")
-
-  @@id([user_id, community_id])
-  @@index([community_id], map: "user_community_fk1")
-}
-
-model favorite {
-  user_id                         Int
-  favorite_id                     Int
-  user_favorite_user_idTouser     user @relation("favorite_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Favorite_fk0")
-  user_favorite_favorite_idTouser user @relation("favorite_favorite_idTouser", fields: [favorite_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Favorite_fk1")
-
-  @@id([user_id, favorite_id])
-  @@index([favorite_id], map: "Favorite_fk1")
+  @@id([user_id, thread_id])
+  @@index([thread_id], map: "Vote_fk1")
 }
