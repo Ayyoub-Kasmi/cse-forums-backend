@@ -10,13 +10,24 @@ const router = Router();
 // router.use(requireAuth);
 
 //manage the thread
+
+router.post('/approve', threadControllers.approve_thread);
+router.delete('/disapprove', threadControllers.disapprove_thread);
+
+router.get('/saved', threadControllers.get_saved_threads);
+router.post('/:threadId/save', threadControllers.save_thread);
+router.delete('/:threadId/save', threadControllers.unsave_thread);
+
 router.post('/create', threadControllers.create_thread);
+router.get('/search', threadControllers.search_thread);
 router.get('/all', threadControllers.get_all_threads);
 router.get('/:id', threadControllers.get_thread);
 router.put('/:id', threadControllers.update_thread);
 router.delete('/:id', threadControllers.delete_thread);
+
 router.post('/:id/tags', threadControllers.add_tags);
 router.delete('/:id/tags', threadControllers.remove_tags);
+
 router.post('/:id/vote', threadControllers.vote_thread);
 router.delete('/:id/vote', threadControllers.unvote_thread);
 
