@@ -1,5 +1,14 @@
 const prisma = require('../prisma/client');
 
+//Defining the filters
+const filters = ["Time"];
+
+//Constants for the search controller
+const WORD_IN_TITLE_WEIGHT = 20;
+const OCCURRENCE_WEIGHT = 4;
+const TAG_WEIGHT = 2;
+const POPULARITY_WEIGHT = 1;
+
 module.exports.create_thread = async (req, res) => {
     try {
         const user_id = Number(req.body.user_id);
@@ -10,7 +19,7 @@ module.exports.create_thread = async (req, res) => {
 
         const thread = await prisma.thread.create({
             data: {
-                user_id, title, content, views: 0, date
+                user_id, title, content, date
             }
         })
 
@@ -65,25 +74,30 @@ module.exports.get_all_threads = async (req, res) => {
         /**
          * req.body = {
          *      ?user_id
+         *      ?filter
          * }
          */
 
-        const user_id = Number(req.body.user_id);
-        if(user_id) {
-            const threads = await prisma.thread.findMany({
-                where: {
-                    user_id,
-                }
-            })
+        const user_id =  req.body.user_id ? Number(req.body.user_id) : undefined;
 
-            res.status(200).json({
-                success: true,
-                message: "threads fetched successfully",
-                data: threads,
-            })
-        }else{
+        const filter = req.query.filter;
 
-        }
+        let threads = null;
+        threads = await prisma.thread.findMany({
+            where: {
+                AND: [
+                    {
+                        user_id: user_id,
+                    },
+                ]
+            }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "threads fetched successfully",
+            data: threads,
+        })
     } catch (error) {
         
         res.status(400).json({
@@ -161,6 +175,231 @@ module.exports.delete_thread = async (req, res) => {
             success: false,
             message: "thread deletion failed: " + error.message,
             data: {},
+        })
+    }
+}
+
+module.exports.search_thread = async (req, res) => {
+    try {
+        const searchQuery = req.query.searchQuery.toLowerCase();
+
+        //fetch threads that contain the desired search query
+        const threads = await prisma.thread.findMany({
+            where: {
+                OR: [
+                    {
+                        title: {
+                            contains: searchQuery,
+                        }
+                    },
+                    {
+                        content: {
+                            contains: searchQuery,
+                        }
+                    }
+                ]
+            },
+            include: {
+                threads_tags: {
+                    include: {
+                        tag: true,
+                    }
+                },
+            }
+        })
+
+        //implement the score system and sort the threads accordingly
+        if(threads){
+            const queryRegEx = new RegExp(searchQuery, "gi");
+
+            threads.sort( (threadA, threadB) => {
+                console.log(threadB.threads_tags);
+
+                const scoreA = 
+                    threadA.title.toLowerCase().includes(searchQuery) ? WORD_IN_TITLE_WEIGHT : 0
+                    + (threadA.content.match(queryRegEx) || []).length * OCCURRENCE_WEIGHT
+                    + (threadA.upvotes - threadA.downvotes) * POPULARITY_WEIGHT
+                    + (threadA.threads_tags.filter( ( {tag} ) => tag.toLowerCase().includes(searchQuery) || []).length) * TAG_WEIGHT;
+                    
+                
+                const scoreB =
+                    threadB.title.includes(searchQuery) ? WORD_IN_TITLE_WEIGHT : 0
+                    + (threadB.content.match(queryRegEx) || []).length * OCCURRENCE_WEIGHT
+                    + (threadB.upvotes - threadB.downvotes) * POPULARITY_WEIGHT
+                    + (threadB.threads_tags.filter( ( {tag} ) => tag.toLowerCase().includes(searchQuery) || []).length) * TAG_WEIGHT;
+
+                return scoreB - scoreA; //Descending sort
+            })
+    
+            res.status(200).json({
+                success: true,
+                message: "thread search processed successfully",
+                data: threads,
+            })
+
+        }else{
+            res.status(200).json({
+                success: true,
+                message: "thread search processed successfully",
+                data: [],
+            })
+        }
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "thread search failed: " + error.message,
+            data: {},
+        })
+    }
+}
+
+module.exports.get_saved_threads = async (req, res) => {
+    try {
+        const user_id = Number(req.query.user);
+        const threads = await prisma.saved_threads.findMany({
+            where: {
+                user_id,
+            }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: 'Saved thread fetched successfully',
+            data: threads,
+        })
+
+    }catch(error){
+        res.status(400).json({
+            success: false,
+            message: "Save threads fetch failed: " + error.message,
+            data: {}
+        })
+    }
+}
+
+module.exports.save_thread = async (req, res) => {
+    try {
+        const user_id = Number(req.body.user_id);
+        const thread_id = Number(req.params.threadId);
+        console.log(user_id, thread_id)
+
+        await prisma.saved_threads.create({
+            data: {
+                thread_id,
+                user_id,
+            }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Thread saved successfully",
+            data: {}
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "Thread save failed: " + error.message,
+            data: {}
+        })
+    }
+}
+
+module.exports.unsave_thread = async (req, res) => {
+    try {
+        const user_id = Number(req.body.user_id);
+        const thread_id = Number(req.params.threadId);
+
+        await prisma.saved_threads.delete({
+            where: {
+                thread_id_user_id: {
+                    user_id,
+                    thread_id,
+                }
+            }
+        })
+
+        res.status(200).json({
+            success: true,
+            message: "Thread unsaved successfully",
+            data: {}
+        })
+
+        
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "Thread unsave failed: " + error.message,
+            data: {}
+        })
+    }
+}
+
+module.exports.approve_thread = async (req, res) => {
+    try {
+        const thread_id = req.query.threadId;
+        let thread = await prisma.thread.findUnique({
+            where: {
+                thread_id,
+            }
+        })
+
+        if(!thread.isApproved){
+            thread = await prisma.thread.update({
+                where: {
+                    thread_id
+                },
+                data: {
+                    isApproved: true,
+                }
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Thread approved successfully",
+            data: thread,
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "Thread approve failed: " + error.message,
+            data: {}
+        })
+    }
+}
+
+module.exports.disapprove_thread = async (req, res) => {
+    try {
+        const thread_id = req.query.threadId;
+        let thread = await prisma.thread.findUnique({
+            where: {
+                thread_id,
+            }
+        })
+
+        if(thread.isApproved){
+            thread = await prisma.thread.update({
+                where: {
+                    thread_id
+                },
+                data: {
+                    isApproved: false,
+                }
+            })
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Thread disapproved successfully",
+            data: thread,
+        })
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: "Thread disapprove failed: " + error.message,
+            data: {}
         })
     }
 }

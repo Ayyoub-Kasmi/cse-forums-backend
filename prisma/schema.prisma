@@ -8,16 +8,17 @@ datasource db {
 }
 
 model answer {
-  id        Int      @id @default(autoincrement())
-  thread_id Int
-  user_id   Int
-  content   String   @db.Text
-  date      DateTime @db.Date
-  likes     Int?     @default(0)
-  thread    thread   @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk0")
-  user      user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk1")
-  like      like[]
-  reply     reply[]
+  id         Int      @id @default(autoincrement())
+  thread_id  Int
+  user_id    Int
+  content    String   @db.Text
+  date       DateTime @db.Date
+  likes      Int?     @default(0)
+  isApproved Boolean? @default(false)
+  thread     thread   @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk0")
+  user       user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Answer_fk1")
+  like       like[]
+  reply      reply[]
 
   @@index([thread_id], map: "Answer_fk0")
   @@index([user_id], map: "Answer_fk1")
@@ -63,22 +64,22 @@ model tag {
 }
 
 model thread {
-  id            Int            @id @default(autoincrement())
-  title         String         @db.VarChar(255)
-  content       String         @db.Text
-  date          DateTime       @db.Date
+  id            Int             @id @default(autoincrement())
+  title         String          @db.VarChar(255)
+  content       String          @db.Text
+  date          DateTime        @db.Date
   user_id       Int
-  upvotes       Int            @default(0)
-  downvotes     Int            @default(0)
-  views         Int?           @default(0)
-  answers_count Int            @default(0)
-  likes_count   Int            @default(0)
+  upvotes       Int             @default(0)
+  downvotes     Int             @default(0)
+  answers_count Int             @default(0)
   answer        answer[]
-  user          user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Thread_fk0")
+  saved_threads saved_threads[]
+  user          user            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Thread_fk0")
   threads_tags  threads_tags[]
   vote          vote[]
 
   @@index([user_id], map: "Thread_fk0")
+
 }
 
 model threads_tags {
@@ -92,20 +93,21 @@ model threads_tags {
 }
 
 model user {
-  id            Int      @id @default(autoincrement())
-  username      String   @unique(map: "username") @db.VarChar(255)
-  email         String   @unique(map: "email") @db.VarChar(255)
-  password      String   @db.VarChar(255)
-  title         String   @db.VarChar(255)
-  bio           String?  @db.Text
-  creation_date DateTime @db.Date
-  facebook_id   String?  @db.VarChar(255)
-  instagram_id  String?  @db.VarChar(255)
-  github_id     String?  @db.VarChar(255)
-  points        Int      @default(0)
+  id            Int             @id @default(autoincrement())
+  username      String          @unique(map: "username") @db.VarChar(255)
+  email         String          @unique(map: "email") @db.VarChar(255)
+  password      String          @db.VarChar(255)
+  title         String          @db.VarChar(255)
+  bio           String?         @db.Text
+  creation_date DateTime        @db.Date
+  facebook_id   String?         @db.VarChar(255)
+  instagram_id  String?         @db.VarChar(255)
+  github_id     String?         @db.VarChar(255)
+  points        Int             @default(0)
   answer        answer[]
   like          like[]
   reply         reply[]
+  saved_threads saved_threads[]
   thread        thread[]
   vote          vote[]
 }
@@ -119,4 +121,14 @@ model vote {
 
   @@id([user_id, thread_id])
   @@index([thread_id], map: "Vote_fk1")
+}
+
+model saved_threads {
+  thread_id Int
+  user_id   Int
+  thread    thread @relation(fields: [thread_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "saved_threads_fk0")
+  user      user   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "saved_threads_fk1")
+
+  @@id([thread_id, user_id])
+  @@index([user_id], map: "saved_threads_fk1")
 }
