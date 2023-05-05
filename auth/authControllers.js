@@ -14,7 +14,7 @@ module.exports.get_signup = async (req, res) => {
 module.exports.post_signup = async (req, res) => {
     try {
         //get data from the request body
-        const {username, email, title, bio,
+        const {username, email, password, title, bio,
         facebook_id, instagram_id, github_id} = req.body;
 
         //set the creation date
@@ -23,14 +23,14 @@ module.exports.post_signup = async (req, res) => {
         //encrypt the password before creating the account using bcrypt
         
         const salt = await bcrypt.genSalt();
-        const password = await bcrypt.hash(req.body.password, salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         //check if there're hooks in prisma! (User a "pre" hook)
 
         //saving the data into the database
         const result = await prisma.user.create({
             data: {
-                username, email, password, title, bio, creation_date,
+                username, email, password: hashedPassword, title, bio, creation_date,
                 facebook_id, instagram_id, github_id
             }
         });
