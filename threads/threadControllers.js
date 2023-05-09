@@ -505,8 +505,9 @@ module.exports.vote_thread = async (req, res) => {
     try {
         const thread_id = Number(req.params.id);
         const {user_id, type} = req.body;
-
-        if(type !== "upvote" || type !== "downvote") throw new Error('Type must be "upvote" or "downvote"');
+        
+        console.log("type: ", type, type === "upvote")
+        if(type !== "upvote" && type !== "downvote") throw new Error('Type must be "upvote" or "downvote"');
 
         let vote = await prisma.vote.findUnique({
             where:{
