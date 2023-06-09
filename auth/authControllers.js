@@ -40,7 +40,7 @@ module.exports.post_signup = async (req, res) => {
         res.cookie('jwt', token, { httpOnly: true, jwt_maxAge});
 
         //Send the response
-        res.status(300).json({
+        res.status(200).json({
             success: true,
             message: 'signup successful',
             data: result
@@ -98,7 +98,7 @@ module.exports.post_login = async (req, res) => {
         res.cookie('jwt', token, { httpOnly: true, jwt_maxAge});
 
         //send the response
-        res.status(300).json({
+        res.status(200).json({
             success: true,
             message: 'login successful',
             data: user

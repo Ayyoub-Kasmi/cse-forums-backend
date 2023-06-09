@@ -16,7 +16,6 @@ module.exports.create_thread = async (req, res) => {
 
         const date = new Date();
 
-
         const thread = await prisma.thread.create({
             data: {
                 user_id, title, content, date
