@@ -37,13 +37,13 @@ module.exports.post_signup = async (req, res) => {
 
         //Create a JWT token for the user & set the cookie
         const token = jwt.sign({username, email}, process.env.JWT_SECRET, {expiresIn: jwt_maxAge});
-        res.cookie('jwt', token, { httpOnly: true, jwt_maxAge});
 
         //Send the response
         res.status(200).json({
             success: true,
             message: 'signup successful',
-            data: result
+            data: result,
+            token: token,
         });
 
     } catch (error) {
@@ -95,13 +95,13 @@ module.exports.post_login = async (req, res) => {
 
         //user successfully authenticated, now create the jwt token
         const token = jwt.sign({username: user.username, email}, process.env.JWT_SECRET, {expiresIn: jwt_maxAge});
-        res.cookie('jwt', token, { httpOnly: true, jwt_maxAge});
 
         //send the response
         res.status(200).json({
             success: true,
             message: 'login successful',
-            data: user
+            data: user,
+            token: token,
         })
 
     } catch (error) {
