@@ -12,6 +12,7 @@ const Joi = require('joi');
 module.exports = {
     schemas: {
         signupSchema: Joi.object({
+            fullname: Joi.string().min(1).max(100).required(),
             username: Joi.string().alphanum().min(1).max(30).required(),
             email: Joi.string().email().max(191).required(),
             password: Joi.string().min(6).max(30).required(),

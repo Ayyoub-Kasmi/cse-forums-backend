@@ -1,6 +1,7 @@
 /** Configure Environment variables */
 require('dotenv').config();
 const cors = require('cors');
+const corsOptions = require('./config/corsOptions')
 
 /** Initialize Express */
 const express = require('express');
@@ -12,13 +13,7 @@ app.use(express.json());
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
 
-/** Setup CORS */
-let corsOptions = {
-    origin: '*',
-};
-
 app.use(cors(corsOptions));
-
 
 /** Routes */
 const authRoutes = require('./auth/authRoutes');

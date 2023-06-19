@@ -1,13 +1,13 @@
 const { Router } = require('express');
 
 const threadControllers = require('./threadControllers');
-const requireAuth = require('../auth/authMiddleware');
+const {verifyUser} = require('../auth/authMiddlewares');
 
 const answerRoutes = require('./answers/answerRoutes');
 
 const router = Router(); 
 
-// router.use(requireAuth);
+// router.use(verifyUser);
 
 //manage the thread
 

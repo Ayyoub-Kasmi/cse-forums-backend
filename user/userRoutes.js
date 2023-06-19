@@ -1,7 +1,8 @@
 const { Router } = require('express');
 
 const userControllers = require('./userControllers');
-const requireAuth = require('../auth/authMiddleware');
+const {verifyUser} = require('../auth/authMiddlewares');
+const userRoles = require('../prisma/userRoles');
 
 //import sub-routes
 const favoriteRoutes = require('./favorites/favoriteRoutes')
@@ -9,12 +10,13 @@ const activityRoutes = require('./activities/activityRoutes');
 
 const router = Router(); 
 
-router.use(requireAuth);
+router.use(verifyUser);
 
 //profile management
-router.get('/:id', requireAuth, userControllers.get_profile); //get the personal profile page
-router.put('/:id', requireAuth, userControllers.update_profile); //edit profile information
-router.delete('/:id', requireAuth, userControllers.delete_profile); //delete the profile
+router.route('/:id')
+    .get(userControllers.get_profile) //get the personal profile page
+    .put(userControllers.update_profile) //edit profile information
+    .delete(userControllers.delete_profile) //delete the profile
 
 //favourites management
 router.use('/:id/favorites', favoriteRoutes);

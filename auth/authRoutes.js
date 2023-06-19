@@ -1,16 +1,17 @@
 const { Router } = require('express');
 
 const authController = require('./authControllers');
-const { validateBody, schemas } = require('../helpers/validator');
+const { validateBody, schemas } = require('../utils/validator');
 
 const router = Router();
 
-router.get('/signup', authController.get_signup);
-router.get('/login', authController.get_login);
-router.get('/test', authController.test);
+router.get('/auth/signup', authController.get_signup);
+router.get('/auth/login', authController.get_login);
+router.get('/auth/test', authController.test);
 
 // router.post('/signup', validateBody(schemas.signupSchema), authController.post_signup);
-router.post('/signup',validateBody(schemas.signupSchema) ,authController.post_signup);
-router.post('/login', validateBody(schemas.loginSchema), authController.post_login);
-router.post('/logout', authController.post_logout);
+router.post('/auth/signup',validateBody(schemas.signupSchema) ,authController.post_signup);
+router.post('/auth/login', validateBody(schemas.loginSchema), authController.post_login);
+router.get('/auth/token/refresh', authController.refresh_token);
+router.post('/auth/logout', authController.post_logout);
 module.exports = router;

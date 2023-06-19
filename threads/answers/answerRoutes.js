@@ -1,7 +1,7 @@
 const { Router } = require('express');
 
 const answerControllers = require('./answerControllers');
-const requireAuth = require('../../auth/authMiddleware');
+const requireAuth = require('../../auth/authMiddlewares');
 
 const replyRoutes = require('./replies/replyRoutes');
 
