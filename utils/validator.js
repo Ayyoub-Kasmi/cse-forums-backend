@@ -1,14 +1,5 @@
 const Joi = require('joi');
 
-// const supplierSchema = Joi.object({
-//     Id: Joi.number().greater(0),
-//     name: Joi.string().alphanum().min(1).max(191).required(),
-//     contact: Joi.string().alphanum().min(1).max(191).required(),
-//     email: Joi.string().email().max(191).required(),
-//     phone_num: Joi.string().length(10).pattern(/^[0-9]+$/).required(),
-//     address: Joi.string().alphanum().min(1).max(191).required(),
-// });
-
 module.exports = {
     schemas: {
         signupSchema: Joi.object({
